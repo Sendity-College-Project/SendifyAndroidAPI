@@ -31,7 +31,7 @@ public class Sendify {
 	private static String HOST;
 	private static String SERVICE;
 	private static int PORT = -1;
-	private final String API_KEY;
+	private static String API_KEY;
 	
 	private static XMPPConnection connection;
 	private static Context context = null;
@@ -45,7 +45,6 @@ public class Sendify {
 		Sendify.SERVICE = this.getService(API_KEY);
 		Sendify.PORT = 5222;
 		Sendify.context = context;
-		SmackAndroid.init(context);
 		if(validate()){
 			ACTIVATE = true;
 			Log.d(LOG, "Sendify().......Successfully");
@@ -55,9 +54,10 @@ public class Sendify {
 	}	
 	
 	public void connect() {
+		SmackAndroid.init(context);
 		connConfig = new AndroidConnectionConfiguration(Sendify.HOST, Sendify.PORT, Sendify.SERVICE);
 		connection = new XMPPConnection(connConfig);
-		
+		Log.d(LOG, "Host Name : "+Sendify.HOST+" Port Number : "+Sendify.PORT+" Service is : "+Sendify.SERVICE);
 		if(Sendify.context!=null){				
 			try {
 				connection.connect();
@@ -76,10 +76,14 @@ public class Sendify {
 		if(ACTIVATE){
 			try {
 				connection.login(username, password);
+				Log.d(LOG, "Sendify.login().......Successfully");
 			} catch (XMPPException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				Log.d(LOG, "Sendify.connect().......Failed due to XMPPException");
 			}
+		} else{
+			Log.d(LOG, "Sendify.login().......failed due to either wrong combination of API_KEY or context");
 		}
 	}	
 
@@ -87,12 +91,17 @@ public class Sendify {
 		if(Sendify.connection!=null){
 			accManager = new AccountManager(connection);
 			try {
-				if(accManager.supportsAccountCreation())
+				if(accManager.supportsAccountCreation()){
 					accManager.createAccount(username, password, attributes);
+					Log.d(LOG, "Sendify.createAccount().......Successfully");
+				}
 			} catch (XMPPException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				Log.d(LOG, "Sendify.createAccount().......Failed due to XMPPException");
 			}
+		} else{
+			Log.d(LOG, "Sendify.createAccount().......failed due to device is not connected to server");
 		}
 	}
 	
@@ -100,18 +109,31 @@ public class Sendify {
 		String attribute = null;
 		if(accManager!=null){
 			attribute = accManager.getAccountAttribute(name);
+			Log.d(LOG, "Sendify.getAccountAttributes().......Successfully");
+		} else {
+			AccountManager accManager = new AccountManager(connection);
+			attribute = accManager.getAccountAttribute(name);
+			Log.d(LOG, "Sendify.getAccountAttributes().......Successfully");
 		}
 		return attribute;
 	}
 	
-	public ArrayList<String> getAccountAttributes(){
-		ArrayList<String> list = new ArrayList<String>();
+	public Collection<String> getAccountAttributes(){
+		Collection<String> list = new ArrayList<String>();
 		if(accManager!=null){
-			list = (ArrayList<String>) accManager.getAccountAttributes();
+			list = accManager.getAccountAttributes();
+			Log.d(LOG, list.toString());
+		} else{
+			AccountManager accManager = new AccountManager(connection);
+			list = accManager.getAccountAttributes();
+			Log.d(LOG, list.toString());
 		}
 		return list;
 	}
 	
+	/*
+	 * No working properly
+	 */
 	public void deleteAccount(){
 		if(accManager!=null){
 			try {
@@ -138,7 +160,7 @@ public class Sendify {
 	/*
 	 * get the node object with a specified name
 	 */
-	public LeafNode getNode(String nodeName){
+	private LeafNode getChannel(String nodeName){
 		if(pubsub!=null){
 			LeafNode node = null;
 			try {

@@ -1,11 +1,17 @@
 package com.sendify.test;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import org.jivesoftware.smack.AndroidConnectionConfiguration;
+import org.jivesoftware.smack.Roster;
+import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.SmackAndroid;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Presence;
 
 import com.sendify.client.R;
 import com.sendify.client.Sendify;
@@ -35,15 +41,27 @@ public class MainActivity extends ActionBarActivity {
         }
         Sendify sendify = new Sendify("123456789", getApplicationContext());
         sendify.connect();
-        sendify.login("yash", "password");
-        HashMap<String, String> attr = new HashMap<String, String>(); 
+        sendify.login("newuser", "password");
+        
+        /*HashMap<String, String> attr = new HashMap<String, String>(); 
 		attr.put("user", "sub"); 
 		attr.put("password", "sub");
-        sendify.createAccount("newuser", "password", attr);
+        sendify.createAccount("newuser", "password", attr);*/ // create account test code
+        
+//        String s = sendify.getAccountAttributes("username");
+//        Log.d("TAG", s);  // getAccountAttribute test code
+        
+        /*Collection<String> list = sendify.getAccountAttributes();
+        Iterator<String> i =list.iterator();
+        while(i.hasNext()){
+        	Log.d("tag", i.next());
+        }*/ // Test for getAccountAttributes()
+        
+        sendify.deleteAccount();
+        
     }
 
-
-    @Override
+        @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         
         // Inflate the menu; this adds items to the action bar if it is present.
