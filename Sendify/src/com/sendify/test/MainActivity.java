@@ -1,12 +1,14 @@
 package com.sendify.test;
 
+import java.util.HashMap;
+
 import org.jivesoftware.smack.AndroidConnectionConfiguration;
 import org.jivesoftware.smack.SmackAndroid;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 
 import com.sendify.client.R;
-import com.sendify.client.SendifyManager;
+import com.sendify.client.Sendify;
 
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
@@ -26,11 +28,18 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-           if (savedInstanceState == null) {
+        if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, new PlaceholderFragment())
                     .commit();
         }
+        Sendify sendify = new Sendify("123456789", getApplicationContext());
+        sendify.connect();
+        sendify.login("yash", "password");
+        HashMap<String, String> attr = new HashMap<String, String>(); 
+		attr.put("user", "sub"); 
+		attr.put("password", "sub");
+        sendify.createAccount("newuser", "password", attr);
     }
 
 
